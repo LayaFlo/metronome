@@ -5,9 +5,10 @@ import {
   MIN_BPM,
   TIME_SIGNATURES,
 } from "@/src/constants/metronome";
+import { useMetronome } from "@/src/hooks/useMetronome";
 import { colors } from "@/src/theme/theme";
 import Slider from "@react-native-community/slider";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
   Button,
@@ -24,6 +25,25 @@ export default function HomeScreen() {
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [isRunning, setIsRunning] = useState(false);
   const [pulseTrigger, setPulseTrigger] = useState(0);
+  const [isAccentBeat, setIsAccentBeat] = useState(true);
+
+  const selectedSignature = useMemo(
+    () =>
+      TIME_SIGNATURES.find((item) => item.value === signature) ??
+      TIME_SIGNATURES[2],
+    [signature],
+  );
+
+  useMetronome({
+    bpm,
+    isRunning,
+    isMuted,
+    timeSignature: selectedSignature,
+    onBeat: ({ isAccent }) => {
+      setIsAccentBeat(isAccent);
+      setPulseTrigger((value) => value + 1);
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -51,7 +71,7 @@ export default function HomeScreen() {
         <Surface style={styles.visualizer} elevation={0}>
           <PulseVisualizer
             pulseTrigger={pulseTrigger}
-            isAccent
+            isAccent={isAccentBeat}
             isRunning={isRunning}
           />
         </Surface>
@@ -76,10 +96,7 @@ export default function HomeScreen() {
         />
         <Button
           mode="contained"
-          onPress={() => {
-            setIsRunning((value) => !value);
-            setPulseTrigger((value) => value + 1);
-          }}
+          onPress={() => setIsRunning((value) => !value)}
           textColor={colors.text}
           contentStyle={styles.buttonContent}
           style={styles.button}
