@@ -1,18 +1,141 @@
+import {
+  DEFAULT_BPM,
+  MAX_BPM,
+  MIN_BPM,
+  TIME_SIGNATURES,
+} from "@/src/constants/metronome";
 import { colors } from "@/src/theme/theme";
-import { View } from "react-native";
-import { Text } from "react-native-paper";
+import Slider from "@react-native-community/slider";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import {
+  Button,
+  IconButton,
+  SegmentedButtons,
+  Surface,
+  Text,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
+  const [isMuted, setIsMuted] = useState(false);
+  const [signature, setSignature] = useState("4/4");
+  const [bpm, setBpm] = useState(DEFAULT_BPM);
+  const [isRunning, setIsRunning] = useState(false);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: colors.background,
-      }}
-    >
-      <Text variant="titleLarge">Hello World</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text variant="headlineMedium" style={styles.title}>
+            Metronome
+          </Text>
+          <IconButton
+            icon={isMuted ? "volume-off" : "volume-high"}
+            iconColor={colors.text}
+            onPress={() => setIsMuted((value) => !value)}
+            accessibilityLabel={isMuted ? "Unmute" : "Mute"}
+          />
+        </View>
+        <SegmentedButtons
+          value={signature}
+          onValueChange={setSignature}
+          buttons={TIME_SIGNATURES.map((item) => ({
+            value: item.value,
+            label: item.label,
+          }))}
+          style={styles.segmentedButtons}
+        />
+        <Surface style={styles.visualizer}>
+          <View style={styles.ripple} />
+          <View style={styles.orb} />
+        </Surface>
+        <View style={styles.tempoSection}>
+          <Text variant="displayLarge" style={styles.bpm}>
+            {bpm}
+          </Text>
+          <Text variant="titleMedium" style={styles.bpmLabel}>
+            BPM
+          </Text>
+        </View>
+        <Slider
+          value={bpm}
+          minimumValue={MIN_BPM}
+          maximumValue={MAX_BPM}
+          step={1}
+          onValueChange={setBpm}
+          minimumTrackTintColor={colors.purple}
+          maximumTrackTintColor={colors.surfaceElevated}
+          thumbTintColor={colors.purpleBright}
+          style={styles.slider}
+        />
+        <Button
+          mode="contained"
+          onPress={() => {
+            setIsRunning((value) => !value);
+          }}
+          textColor={colors.text}
+          contentStyle={styles.buttonContent}
+          style={styles.button}
+          accessibilityLabel={isRunning ? "Stop metronome" : "Start metronome"}
+        >
+          {isRunning ? "Stop" : "Play"}
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "space-between",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  title: { fontWeight: "700" },
+  segmentedButtons: { marginTop: 12 },
+  visualizer: {
+    height: 220,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 24,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  ripple: {
+    position: "absolute",
+    width: 132,
+    height: 132,
+    borderRadius: 66,
+    borderWidth: 2,
+    borderColor: colors.purple,
+    opacity: 0.25,
+  },
+  orb: {
+    width: 92,
+    height: 92,
+    borderRadius: 66,
+    backgroundColor: colors.purple,
+  },
+  tempoSection: { alignItems: "center" },
+  bpm: { fontWeight: "800" },
+  bpmLabel: {
+    color: colors.secondary,
+    letterSpacing: 4,
+  },
+  slider: { width: "100%" },
+  button: { borderRadius: 66 },
+  buttonContent: {
+    height: 56,
+  },
+});
