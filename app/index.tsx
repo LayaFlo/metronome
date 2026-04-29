@@ -1,3 +1,4 @@
+import { PulseVisualizer } from "@/src/components/PulseVisualizer";
 import {
   DEFAULT_BPM,
   MAX_BPM,
@@ -22,6 +23,7 @@ export default function HomeScreen() {
   const [signature, setSignature] = useState("4/4");
   const [bpm, setBpm] = useState(DEFAULT_BPM);
   const [isRunning, setIsRunning] = useState(false);
+  const [pulseTrigger, setPulseTrigger] = useState(0);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -46,9 +48,12 @@ export default function HomeScreen() {
           }))}
           style={styles.segmentedButtons}
         />
-        <Surface style={styles.visualizer}>
-          <View style={styles.ripple} />
-          <View style={styles.orb} />
+        <Surface style={styles.visualizer} elevation={0}>
+          <PulseVisualizer
+            pulseTrigger={pulseTrigger}
+            isAccent
+            isRunning={isRunning}
+          />
         </Surface>
         <View style={styles.tempoSection}>
           <Text variant="displayLarge" style={styles.bpm}>
@@ -73,6 +78,7 @@ export default function HomeScreen() {
           mode="contained"
           onPress={() => {
             setIsRunning((value) => !value);
+            setPulseTrigger((value) => value + 1);
           }}
           textColor={colors.text}
           contentStyle={styles.buttonContent}
@@ -111,21 +117,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  ripple: {
-    position: "absolute",
-    width: 132,
-    height: 132,
-    borderRadius: 66,
-    borderWidth: 2,
-    borderColor: colors.purple,
-    opacity: 0.25,
-  },
-  orb: {
-    width: 92,
-    height: 92,
-    borderRadius: 66,
-    backgroundColor: colors.purple,
   },
   tempoSection: { alignItems: "center" },
   bpm: { fontWeight: "800" },
