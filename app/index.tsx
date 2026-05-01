@@ -11,7 +11,7 @@ import Slider from "@react-native-community/slider";
 import { useAudioPlayer } from "expo-audio";
 import { useKeepAwake } from "expo-keep-awake";
 import { useEffect, useMemo, useState } from "react";
-import { AppState, StyleSheet, View } from "react-native";
+import { AppState, ScrollView, StyleSheet, View } from "react-native";
 import {
   Button,
   IconButton,
@@ -80,64 +80,75 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       {isRunning ? <RunningKeepAwake /> : null}
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text variant="headlineMedium" style={styles.title}>
-            Metronome
-          </Text>
-          <IconButton
-            icon={isMuted ? "volume-off" : "volume-high"}
-            iconColor={colors.text}
-            onPress={() => setIsMuted((value) => !value)}
-            accessibilityLabel={isMuted ? "Unmute" : "Mute"}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.topContent}>
+          <View style={styles.header}>
+            <Text variant="headlineMedium" style={styles.title}>
+              Metronome
+            </Text>
+            <IconButton
+              icon={isMuted ? "volume-off" : "volume-high"}
+              iconColor={isMuted ? colors.secondary : colors.text}
+              containerColor={isMuted ? colors.surface : undefined}
+              onPress={() => setIsMuted((value) => !value)}
+              accessibilityLabel={isMuted ? "Unmute" : "Mute"}
+            />
+          </View>
+          <SegmentedButtons
+            value={signature}
+            onValueChange={setSignature}
+            buttons={TIME_SIGNATURES.map((item) => ({
+              value: item.value,
+              label: item.label,
+            }))}
+            style={styles.segmentedButtons}
           />
+          <Surface style={styles.visualizer} elevation={0}>
+            <PulseVisualizer
+              pulseTrigger={pulseTrigger}
+              isAccent={isAccentBeat}
+              isRunning={isRunning}
+            />
+          </Surface>
+          <View style={styles.tempoSection}>
+            <Text variant="displayLarge" style={styles.bpm}>
+              {bpm}
+            </Text>
+            <Text variant="titleMedium" style={styles.bpmLabel}>
+              BPM
+            </Text>
+          </View>
+          <View style={styles.sliderWrapper}>
+            <Slider
+              value={bpm}
+              minimumValue={MIN_BPM}
+              maximumValue={MAX_BPM}
+              step={1}
+              onValueChange={setBpm}
+              minimumTrackTintColor={colors.purple}
+              maximumTrackTintColor={colors.surfaceElevated}
+              thumbTintColor={colors.purpleBright}
+              style={styles.slider}
+            />
+          </View>
         </View>
-        <SegmentedButtons
-          value={signature}
-          onValueChange={setSignature}
-          buttons={TIME_SIGNATURES.map((item) => ({
-            value: item.value,
-            label: item.label,
-          }))}
-          style={styles.segmentedButtons}
-        />
-        <Surface style={styles.visualizer} elevation={0}>
-          <PulseVisualizer
-            pulseTrigger={pulseTrigger}
-            isAccent={isAccentBeat}
-            isRunning={isRunning}
-          />
-        </Surface>
-        <View style={styles.tempoSection}>
-          <Text variant="displayLarge" style={styles.bpm}>
-            {bpm}
-          </Text>
-          <Text variant="titleMedium" style={styles.bpmLabel}>
-            BPM
-          </Text>
-        </View>
-        <Slider
-          value={bpm}
-          minimumValue={MIN_BPM}
-          maximumValue={MAX_BPM}
-          step={1}
-          onValueChange={setBpm}
-          minimumTrackTintColor={colors.purple}
-          maximumTrackTintColor={colors.surfaceElevated}
-          thumbTintColor={colors.purpleBright}
-          style={styles.slider}
-        />
         <Button
           mode="contained"
           onPress={() => setIsRunning((value) => !value)}
           textColor={colors.text}
-          contentStyle={styles.buttonContent}
-          style={styles.button}
+          labelStyle={styles.playButtonLabel}
+          contentStyle={styles.playButtonContent}
+          style={styles.playButton}
+          buttonColor={isRunning ? "#7C3AED" : colors.purple}
           accessibilityLabel={isRunning ? "Stop metronome" : "Start metronome"}
         >
           {isRunning ? "Stop" : "Play"}
         </Button>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -153,18 +164,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  container: {
-    flex: 1,
+  scrollView: { flex: 1 },
+  scrollContent: {
+    flexGrow: 1,
     padding: 24,
-    justifyContent: "space-between",
   },
+  topContent: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginTop: 12,
   },
   title: { fontWeight: "700" },
-  segmentedButtons: { marginTop: 12 },
+  segmentedButtons: { marginTop: 28 },
   visualizer: {
     height: 220,
     alignItems: "center",
@@ -173,16 +186,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+    marginTop: 32,
   },
-  tempoSection: { alignItems: "center" },
+  tempoSection: { alignItems: "center", marginTop: 28 },
   bpm: { fontWeight: "800" },
   bpmLabel: {
     color: colors.secondary,
     letterSpacing: 4,
   },
-  slider: { width: "100%" },
-  button: { borderRadius: 66 },
-  buttonContent: {
-    height: 56,
+  sliderWrapper: {
+    marginTop: 8,
+    paddingHorizontal: 20,
   },
+  slider: { width: "100%" },
+  playButton: { borderRadius: 66, marginTop: 28, elevation: 0 },
+  playButtonContent: { height: 62 },
+  playButtonLabel: { fontSize: 18, fontWeight: "700" },
 });

@@ -1,7 +1,7 @@
 import { MD3DarkTheme } from "react-native-paper";
 
 export const colors = {
-  background: "#09090B",
+  background: "#0B0913",
   surface: "#14141A",
   surfaceElevated: "#1D1D27",
   purple: "#A855F7",

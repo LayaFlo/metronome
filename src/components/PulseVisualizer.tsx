@@ -66,16 +66,18 @@ export function PulseVisualizer({
 const styles = StyleSheet.create({
   ripple: {
     position: "absolute",
-    width: 132,
-    height: 132,
+    width: 124,
+    height: 124,
     borderRadius: 66,
     borderWidth: 2,
     borderColor: colors.purple,
   },
   orb: {
-    width: 92,
-    height: 92,
+    width: 84,
+    height: 84,
     borderRadius: 46,
     backgroundColor: colors.purple,
+    borderWidth: 2,
+    borderColor: colors.purpleBright,
   },
 });
