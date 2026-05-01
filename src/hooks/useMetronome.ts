@@ -5,7 +5,11 @@ type UseMetronomeParams = {
   bpm: number;
   isRunning: boolean;
   timeSignature: TimeSignature;
-  onBeat: (params: { beat: number; isAccent: boolean }) => void;
+  onBeat: (params: {
+    beat: number;
+    isAccent: boolean;
+    isStrongAccent: boolean;
+  }) => void;
 };
 
 export function useMetronome({
@@ -46,9 +50,11 @@ export function useMetronome({
 
       if (now >= nextTickTimeRef.current) {
         const beat = beatRef.current;
-        const isAccent = timeSignature.accents.includes(beat);
+        const isStrongAccent = timeSignature.accents.includes(beat);
+        const isAccent =
+          isStrongAccent || timeSignature.secondaryAccents?.includes(beat) === true;
 
-        onBeatRef.current({ beat, isAccent });
+        onBeatRef.current({ beat, isAccent, isStrongAccent });
 
         beatRef.current =
           beatRef.current >= timeSignature.beatsPerBar
@@ -72,6 +78,7 @@ export function useMetronome({
     isRunning,
     timeSignature.accents,
     timeSignature.beatsPerBar,
+    timeSignature.secondaryAccents,
     timeSignature.value,
   ]);
 }

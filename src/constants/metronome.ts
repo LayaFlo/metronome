@@ -7,13 +7,14 @@ export type TimeSignature = {
   value: string;
   beatsPerBar: number;
   accents: number[];
+  secondaryAccents?: number[];
 };
 
 export const TIME_SIGNATURES: TimeSignature[] = [
   { label: "2/4", value: "2/4", beatsPerBar: 2, accents: [1] },
   { label: "3/4", value: "3/4", beatsPerBar: 3, accents: [1] },
   { label: "4/4", value: "4/4", beatsPerBar: 4, accents: [1] },
-  { label: "6/8", value: "6/8", beatsPerBar: 6, accents: [1, 4] },
+  { label: "6/8", value: "6/8", beatsPerBar: 6, accents: [1], secondaryAccents: [4] },
 ];
 
 export function normalizeBpm(value: number): number {

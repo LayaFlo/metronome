@@ -44,10 +44,10 @@ export default function HomeScreen() {
     [signature],
   );
 
-  function playClick(isAccent: boolean) {
+  function playClick(isStrongAccent: boolean) {
     if (isMuted) return;
 
-    const player = isAccent ? strongClickPlayer : weakClickPlayer;
+    const player = isStrongAccent ? strongClickPlayer : weakClickPlayer;
 
     void player
       .seekTo(0)
@@ -61,8 +61,8 @@ export default function HomeScreen() {
     bpm,
     isRunning,
     timeSignature: selectedSignature,
-    onBeat: ({ isAccent }) => {
-      playClick(isAccent);
+    onBeat: ({ isAccent, isStrongAccent }) => {
+      playClick(isStrongAccent);
       setIsAccentBeat(isAccent);
       setPulseTrigger((value) => value + 1);
     },
