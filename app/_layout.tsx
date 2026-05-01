@@ -11,7 +11,6 @@ export default function RootLayout() {
         await setAudioModeAsync({
           playsInSilentMode: true,
           shouldPlayInBackground: false,
-          interruptionMode: "mixWithOthers",
           allowsRecording: false,
           shouldRouteThroughEarpiece: false,
         });
