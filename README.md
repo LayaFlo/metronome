@@ -1,50 +1,99 @@
-# Welcome to your Expo app 👋
+# Metronome
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A small cross-platform metronome for iOS and Android built with Expo, React Native, and TypeScript.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Adjustable BPM from 30 to 240
+- BPM can be changed while running
+- Start and stop playback
+- Audible metronome clicks with accented downbeats
+- Visual beat pulse that continues while muted
+- Supported time signatures: 2/4, 3/4, 4/4, and 6/8
+- Time signature changes are applied immediately during playback
+- Sound is enabled by default
+- Mute stops audio only; visual pulse keeps running
+- Stops when the app moves to the background
+- Keeps the screen awake only while running
+- Dark purple single-screen UI
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+- Expo
+- React Native
+- TypeScript
+- expo-audio
+- expo-keep-awake
+- react-native-reanimated
+- React Native Paper
+- @react-native-community/slider
 
-   ```bash
-   npx expo start
-   ```
+## Run Locally
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Install dependencies:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Start the Expo development server:
 
-## Learn more
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Then:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- scan the QR code with **Expo Go** on iOS or Android, or
+- press **a** to open an Android emulator
 
-## Join the community
+## Development
 
-Join our community of developers creating universal apps.
+Run lint:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm run lint
+```
+
+Run type checks:
+
+```bash
+npm run typecheck
+```
+
+## Design / Technical Decisions
+
+### Focused single-screen UI
+
+I focused on the core metronome experience: selecting a tempo, choosing a time signature, and starting playback with clear audio and visual beat feedback.
+
+### Visual beat feedback
+
+Instead of displaying changing beat counters or dense beat indicators, the app uses a pulse and ripple animation. This keeps the UI clean and scales well across different time signatures.
+
+### Audio
+
+The app uses `expo-audio` with short local WAV click samples for simple playback.
+
+A stronger click is used for accented beats, while weaker clicks are used for regular beats.
+
+### Wake lock / app lifecycle
+
+The screen stays awake only while the metronome is running. Playback stops when the app moves to the background.
+
+## Known Limitations / Tradeoffs
+
+- Beat scheduling is implemented in JavaScript, so timing may not be perfectly precise under heavy device load.
+- For a production-grade musical metronome, a native audio scheduler or pre-scheduled audio buffer would provide tighter timing.
+- Time signatures are limited to common presets: 2/4, 3/4, 4/4, and 6/8.
+- Only one click sound style is currently supported.
+
+## Improvements With More Time
+
+- Tap tempo
+- Custom time signatures
+- Multiple sound profiles
+- Haptic feedback
+- Saved tempo presets
+- Subdivision and accent customization
+- Improved timing precision using a native scheduling approach

@@ -187,6 +187,13 @@ export default function HomeScreen() {
                 minimumTrackTintColor={colors.purple}
                 maximumTrackTintColor={colors.surfaceElevated}
                 thumbTintColor={colors.purpleBright}
+                accessibilityLabel="Tempo"
+                accessibilityValue={{
+                  min: MIN_BPM,
+                  max: MAX_BPM,
+                  now: bpm,
+                  text: `${bpm} BPM`,
+                }}
                 style={styles.slider}
               />
             </View>
