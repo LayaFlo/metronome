@@ -23,9 +23,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import strongClickSource from "../assets/sounds/click-strong.wav";
 import weakClickSource from "../assets/sounds/click-weak.wav";
 
+const clickPlayerOptions = { keepAudioSessionActive: true };
+
 export default function HomeScreen() {
-  const weakClickPlayer = useAudioPlayer(weakClickSource);
-  const strongClickPlayer = useAudioPlayer(strongClickSource);
+  const weakClickPlayer = useAudioPlayer(weakClickSource, clickPlayerOptions);
+  const weakClickPlayerAlt = useAudioPlayer(
+    weakClickSource,
+    clickPlayerOptions,
+  );
+  const strongClickPlayer = useAudioPlayer(
+    strongClickSource,
+    clickPlayerOptions,
+  );
+  const strongClickPlayerAlt = useAudioPlayer(
+    strongClickSource,
+    clickPlayerOptions,
+  );
 
   const [isMuted, setIsMuted] = useState(false);
   const [signature, setSignature] = useState("4/4");
@@ -36,6 +49,8 @@ export default function HomeScreen() {
   const sliderTapAreaRef = useRef<View>(null);
   const sliderLeftRef = useRef(0);
   const sliderWidthRef = useRef(0);
+  const weakClickPlayerIndexRef = useRef(0);
+  const strongClickPlayerIndexRef = useRef(0);
 
   const selectedSignature = useMemo(
     () =>
@@ -47,7 +62,15 @@ export default function HomeScreen() {
   function playClick(isStrongAccent: boolean) {
     if (isMuted) return;
 
-    const player = isStrongAccent ? strongClickPlayer : weakClickPlayer;
+    const players = isStrongAccent
+      ? [strongClickPlayer, strongClickPlayerAlt]
+      : [weakClickPlayer, weakClickPlayerAlt];
+    const playerIndexRef = isStrongAccent
+      ? strongClickPlayerIndexRef
+      : weakClickPlayerIndexRef;
+    const player = players[playerIndexRef.current];
+
+    playerIndexRef.current = (playerIndexRef.current + 1) % players.length;
 
     void player
       .seekTo(0)
