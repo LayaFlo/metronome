@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 type UseMetronomeParams = {
   bpm: number;
   isRunning: boolean;
-  isMuted: boolean;
   timeSignature: TimeSignature;
   onBeat: (params: { beat: number; isAccent: boolean }) => void;
 };
@@ -12,7 +11,6 @@ type UseMetronomeParams = {
 export function useMetronome({
   bpm,
   isRunning,
-  isMuted,
   timeSignature,
   onBeat,
 }: UseMetronomeParams) {
@@ -52,10 +50,6 @@ export function useMetronome({
 
         onBeatRef.current({ beat, isAccent });
 
-        if (!isMuted) {
-          // Play click
-        }
-
         beatRef.current =
           beatRef.current >= timeSignature.beatsPerBar
             ? 1
@@ -75,7 +69,6 @@ export function useMetronome({
       }
     };
   }, [
-    isMuted,
     isRunning,
     timeSignature.accents,
     timeSignature.beatsPerBar,

@@ -8,6 +8,7 @@ import {
 import { useMetronome } from "@/src/hooks/useMetronome";
 import { colors } from "@/src/theme/theme";
 import Slider from "@react-native-community/slider";
+import { useAudioPlayer } from "expo-audio";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
@@ -18,8 +19,13 @@ import {
   Text,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import strongClickSource from "../assets/sounds/click-strong.wav";
+import weakClickSource from "../assets/sounds/click-weak.wav";
 
 export default function HomeScreen() {
+  const weakClickPlayer = useAudioPlayer(weakClickSource);
+  const strongClickPlayer = useAudioPlayer(strongClickSource);
+
   const [isMuted, setIsMuted] = useState(false);
   const [signature, setSignature] = useState("4/4");
   const [bpm, setBpm] = useState(DEFAULT_BPM);
@@ -34,12 +40,25 @@ export default function HomeScreen() {
     [signature],
   );
 
+  function playClick(isAccent: boolean) {
+    if (isMuted) return;
+
+    const player = isAccent ? strongClickPlayer : weakClickPlayer;
+
+    void player
+      .seekTo(0)
+      .then(() => player.play())
+      .catch((error) => {
+        console.warn("Failed to play metronome click", error);
+      });
+  }
+
   useMetronome({
     bpm,
     isRunning,
-    isMuted,
     timeSignature: selectedSignature,
     onBeat: ({ isAccent }) => {
+      playClick(isAccent);
       setIsAccentBeat(isAccent);
       setPulseTrigger((value) => value + 1);
     },
