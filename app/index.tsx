@@ -9,8 +9,9 @@ import { useMetronome } from "@/src/hooks/useMetronome";
 import { colors } from "@/src/theme/theme";
 import Slider from "@react-native-community/slider";
 import { useAudioPlayer } from "expo-audio";
-import { useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useKeepAwake } from "expo-keep-awake";
+import { useEffect, useMemo, useState } from "react";
+import { AppState, StyleSheet, View } from "react-native";
 import {
   Button,
   IconButton,
@@ -64,8 +65,21 @@ export default function HomeScreen() {
     },
   });
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "background") {
+        setIsRunning(false);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {isRunning ? <RunningKeepAwake /> : null}
       <View style={styles.container}>
         <View style={styles.header}>
           <Text variant="headlineMedium" style={styles.title}>
@@ -126,6 +140,12 @@ export default function HomeScreen() {
       </View>
     </SafeAreaView>
   );
+}
+
+function RunningKeepAwake() {
+  useKeepAwake("metronome");
+
+  return null;
 }
 
 const styles = StyleSheet.create({
