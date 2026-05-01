@@ -10,7 +10,7 @@ import { colors } from "@/src/theme/theme";
 import Slider from "@react-native-community/slider";
 import { useAudioPlayer } from "expo-audio";
 import { useKeepAwake } from "expo-keep-awake";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppState, ScrollView, StyleSheet, View } from "react-native";
 import {
   Button,
@@ -33,6 +33,9 @@ export default function HomeScreen() {
   const [isRunning, setIsRunning] = useState(false);
   const [pulseTrigger, setPulseTrigger] = useState(0);
   const [isAccentBeat, setIsAccentBeat] = useState(true);
+  const sliderTapAreaRef = useRef<View>(null);
+  const sliderLeftRef = useRef(0);
+  const sliderWidthRef = useRef(0);
 
   const selectedSignature = useMemo(
     () =>
@@ -76,6 +79,26 @@ export default function HomeScreen() {
       subscription.remove();
     };
   }, []);
+
+  function measureSlider() {
+    sliderTapAreaRef.current?.measureInWindow((x, _y, width) => {
+      sliderLeftRef.current = x;
+      sliderWidthRef.current = width;
+    });
+  }
+
+  function setBpmFromPageX(pageX: number) {
+    const sliderWidth = sliderWidthRef.current;
+
+    if (sliderWidth <= 0) return;
+
+    const x = pageX - sliderLeftRef.current;
+    const clampedX = Math.max(0, Math.min(sliderWidth, x));
+    const percentage = clampedX / sliderWidth;
+    const nextBpm = Math.round(MIN_BPM + percentage * (MAX_BPM - MIN_BPM));
+
+    setBpm(nextBpm);
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -122,18 +145,28 @@ export default function HomeScreen() {
               BPM
             </Text>
           </View>
-          <View style={styles.sliderWrapper}>
-            <Slider
-              value={bpm}
-              minimumValue={MIN_BPM}
-              maximumValue={MAX_BPM}
-              step={1}
-              onValueChange={setBpm}
-              minimumTrackTintColor={colors.purple}
-              maximumTrackTintColor={colors.surfaceElevated}
-              thumbTintColor={colors.purpleBright}
-              style={styles.slider}
-            />
+          <View style={styles.sliderOuter}>
+            <View
+              ref={sliderTapAreaRef}
+              onLayout={measureSlider}
+              onTouchStart={(event) => {
+                measureSlider();
+                setBpmFromPageX(event.nativeEvent.pageX);
+              }}
+              style={styles.sliderTapArea}
+            >
+              <Slider
+                value={bpm}
+                minimumValue={MIN_BPM}
+                maximumValue={MAX_BPM}
+                step={1}
+                onValueChange={setBpm}
+                minimumTrackTintColor={colors.purple}
+                maximumTrackTintColor={colors.surfaceElevated}
+                thumbTintColor={colors.purpleBright}
+                style={styles.slider}
+              />
+            </View>
           </View>
         </View>
         <Button
@@ -194,11 +227,15 @@ const styles = StyleSheet.create({
     color: colors.secondary,
     letterSpacing: 4,
   },
-  sliderWrapper: {
+  sliderOuter: {
     marginTop: 8,
     paddingHorizontal: 20,
   },
-  slider: { width: "100%" },
+  sliderTapArea: {
+    height: 48,
+    justifyContent: "center",
+  },
+  slider: { width: "100%", height: 44 },
   playButton: { borderRadius: 66, marginTop: 28, elevation: 0 },
   playButtonContent: { height: 62 },
   playButtonLabel: { fontSize: 18, fontWeight: "700" },
